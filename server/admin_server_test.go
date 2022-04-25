@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/imhshekhar47/ops-admin/config"
+	"github.com/imhshekhar47/ops-admin/pb"
 	"github.com/imhshekhar47/ops-admin/service"
 	"github.com/imhshekhar47/ops-admin/util"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -32,6 +33,19 @@ func TestGetAdmin(t *testing.T) {
 
 	if admin.Uuid != id {
 		t.Errorf("incorrect response of GetAdmin, expected '%s' found '%s'", id, admin.Uuid)
+		t.Fail()
+	}
+}
+
+func TestGetAdminHealth(t *testing.T) {
+	health, err := tServer.GetAdminHealth(context.Background(), &emptypb.Empty{})
+	if err != nil {
+		t.Error("failed to call gRPC GetAdminHealth")
+		t.Fail()
+	}
+
+	if health.Status != pb.StatusCode_UP {
+		t.Errorf("incorrect response of GetAdminHealth")
 		t.Fail()
 	}
 }

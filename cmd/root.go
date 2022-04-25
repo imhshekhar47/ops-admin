@@ -5,6 +5,7 @@ Code ownership is with Himanshu Shekhar. Use without modifications.
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/imhshekhar47/ops-admin/config"
@@ -76,19 +77,19 @@ func initConfig() {
 
 func loadServerConfig() {
 	util.Logger.WithField("origin", "cmd::root").Traceln("entry: loadServerConfig()")
-	hostname := viper.GetString("server.hostname")
-	if hostname == "" {
-		hostname = util.GetHostname()
-	}
+	hostname := util.NonEmptyOrDefult(viper.GetString("server.hostname"), util.GetHostname())
 
-	coreConiguration := config.CoreConfiguration{
+	address := fmt.Sprintf("%s:%d", hostname, argStartGrpcPort)
+
+	coreConfiguration := config.CoreConfiguration{
 		Version: viper.GetString("core.version"),
 	}
 
 	adminConfiguration = &config.AdminConfiguration{
-		Core:     coreConiguration,
+		Core:     coreConfiguration,
 		Hostname: hostname,
 		Uuid:     util.Encode(hostname),
+		Address:  address,
 	}
 
 	util.Logger.WithField("origin", "cmd::root").Debugln("agent_configuration", adminConfiguration)

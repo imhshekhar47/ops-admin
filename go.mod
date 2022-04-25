@@ -3,6 +3,7 @@ module github.com/imhshekhar47/ops-admin
 go 1.18
 
 require (
+	github.com/gorilla/handlers v1.5.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
@@ -13,6 +14,7 @@ require (
 )
 
 require (
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

@@ -8,4 +8,5 @@ type AdminConfiguration struct {
 	Core     CoreConfiguration
 	Uuid     string
 	Hostname string
+	Address  string
 }

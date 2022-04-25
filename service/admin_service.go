@@ -20,7 +20,8 @@ func NewAdminService(config *config.AdminConfiguration) *AdminService {
 				Timestamp: timestamppb.Now(),
 				Version:   config.Core.Version,
 			},
-			Uuid: config.Uuid,
+			Uuid:    config.Uuid,
+			Address: config.Address,
 		},
 	}
 }
