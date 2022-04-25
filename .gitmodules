@@ -1,0 +1,3 @@
+[submodule "ops-spec"]
+	path = ops-spec
+	url = https://github.com/imhshekhar47/ops-spec
