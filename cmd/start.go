@@ -83,7 +83,7 @@ func runStartCmd(cmd *cobra.Command, args []string) {
 	adminService = service.NewAdminService(adminConfiguration)
 
 	// servers
-	adminServer = server.NewAdminServer(util.Logger, adminService)
+	adminServer = server.NewAdminServer(adminConfiguration, util.Logger, adminService)
 
 	// rest
 	if argStartRestPort > 5000 {

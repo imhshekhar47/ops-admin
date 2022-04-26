@@ -20,8 +20,9 @@ var (
 		Hostname: id,
 		Uuid:     id,
 	}
-	tService *service.AdminService = service.NewAdminService(tConfig)
-	tServer  *AdminServer          = NewAdminServer(util.Logger, tService)
+	tAdminService *service.AdminService = service.NewAdminService(tConfig)
+
+	tServer *AdminServer = NewAdminServer(tConfig, util.Logger, tAdminService)
 )
 
 func TestGetAdmin(t *testing.T) {

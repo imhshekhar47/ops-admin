@@ -23,8 +23,10 @@ var (
 	argStartRestPort uint16
 
 	adminConfiguration *config.AdminConfiguration
-	adminService       *service.AdminService
-	adminServer        *server.AdminServer
+
+	adminService *service.AdminService
+
+	adminServer *server.AdminServer
 )
 
 // rootCmd represents the base command when called without any subcommands
