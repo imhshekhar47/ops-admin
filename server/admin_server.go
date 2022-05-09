@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/imhshekhar47/ops-admin/config"
-	"github.com/imhshekhar47/ops-admin/model"
 	"github.com/imhshekhar47/ops-admin/pb"
 	"github.com/imhshekhar47/ops-admin/service"
 	"github.com/imhshekhar47/ops-admin/util"
@@ -13,7 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type AdminServer struct {
@@ -22,8 +20,6 @@ type AdminServer struct {
 	log         *logrus.Entry
 
 	adminService *service.AdminService
-
-	root *model.InfraNode
 }
 
 func NewAdminServer(
@@ -35,18 +31,13 @@ func NewAdminServer(
 		adminConfig:  config,
 		log:          logger.WithField("origin", "server::AdminServer"),
 		adminService: anAdminService,
-
-		root: model.NewInfraNode("root", &model.InfraData{
-			Name: "Infra",
-			Type: model.NodeTypeRoot,
-		}),
 	}
 }
 
 func (s *AdminServer) GetAdmin(context.Context, *emptypb.Empty) (*pb.Admin, error) {
+	defer util.Timer(time.Now(), "OpsAdminService/GetAdmin")
 	s.log.Traceln("entry: GetAdmin()")
 	s.log.Traceln("ext: GetAdmin()")
-	defer util.Timer(time.Now(), "OpsAdminService/GetAdmin")
 	return s.adminService.Get(), nil
 }
 
@@ -58,6 +49,7 @@ func (s *AdminServer) GetAdminHealth(context.Context, *emptypb.Empty) (*pb.Healt
 }
 
 func (s *AdminServer) Register(ctx context.Context, agent *pb.Agent) (*emptypb.Empty, error) {
+	defer util.Timer(time.Now(), "OpsAdminService/Register")
 	s.log.Tracef("entry: Register(%s)\n", agent.Uuid)
 	s.log.Tracef("Request[%s]", util.Serialize(agent))
 
@@ -65,47 +57,50 @@ func (s *AdminServer) Register(ctx context.Context, agent *pb.Agent) (*emptypb.E
 
 	response := &emptypb.Empty{}
 	s.log.Traceln("exit: Register()")
-	defer util.Timer(time.Now(), "OpsAdminService/Register")
 	return response, nil
 }
 
 func (s *AdminServer) GetAgentList(context.Context, *emptypb.Empty) (*pb.AgentList, error) {
+	defer util.Timer(time.Now(), "OpsAdminService/GetAgentList")
 	s.log.Traceln("entry: GetAgentList(ctx, {})")
 	agentArr := make([]*pb.Agent, 0)
 
-	for _, cAgent := range s.adminService.GetAllAgent() {
+	for _, cAgent := range s.adminService.ListAgent() {
 		agentArr = append(agentArr, &pb.Agent{
-			Meta: &pb.Metadata{
-				Timestamp: timestamppb.Now(),
-				Version:   s.adminConfig.Core.Version,
-			},
 			Uuid:    cAgent.Uuid,
 			Address: cAgent.Address,
 		})
 	}
 
-	// s.log.Tracef("exit: GetAgentList(): %d", len(agentArr))
-	defer util.Timer(time.Now(), "OpsAdminService/GetAgentList")
+	s.log.Traceln("exit: GetAgentList()")
 	return &pb.AgentList{
 		Items: agentArr,
 	}, nil
 }
 
 func (s *AdminServer) GetAgentById(ctx context.Context, request *pb.AgentRequest) (*pb.Agent, error) {
+	defer util.Timer(time.Now(), "OpsAdminService/GetAgentById")
 	s.log.Tracef("entry: GetAgentById(ctx, %s)", util.Serialize(request))
 	cAgent, err := s.adminService.FindAgent(request.Uuid)
+
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "No agent found with this uuid")
 	}
 
 	s.log.Traceln("exit: GetAgentById()")
-	defer util.Timer(time.Now(), "OpsAdminService/GetAgentById")
 	return &pb.Agent{
-		Meta: &pb.Metadata{
-			Timestamp: timestamppb.New(cAgent.JoinedAt),
-			Version:   s.adminConfig.Core.Version,
-		},
 		Uuid:    cAgent.Uuid,
 		Address: cAgent.Address,
+	}, nil
+}
+
+func (s *AdminServer) GetInfra(context.Context, *emptypb.Empty) (*pb.Infra, error) {
+	defer util.Timer(time.Now(), "OpsAdminService/GetInfra")
+	s.log.Tracef("entry: GetInfra()")
+	s.log.Tracef("exit: GetInfra()")
+	original := s.adminService.GetInfra()
+
+	return &pb.Infra{
+		Root: original.Root,
 	}, nil
 }
